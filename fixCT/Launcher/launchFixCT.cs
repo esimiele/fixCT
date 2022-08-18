@@ -1,29 +1,28 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Diagnostics;
-using System.Reflection;
 using System.IO;
-using System.Windows.Forms;
+using System.Runtime.CompilerServices;
 using VMS.TPS.Common.Model.API;
+using System.Windows;
+
 
 namespace VMS.TPS
 {
     public class Script
     {
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public void Execute(ScriptContext context)
         {
             try
             {
                 Process.Start(AppExePath());
             }
-            catch (Exception e) { MessageBox.Show(e.Message); };
+            catch (Exception e) { MessageBox.Show(String.Format("{0}\n{1}",AppExePath(), e.Message)); };
         }
         private string AppExePath()
         {
-            return FirstExePathIn(AssemblyDirectory());
+            return FirstExePathIn(Path.GetDirectoryName(GetSourceFilePath()));
         }
 
         private string FirstExePathIn(string dir)
@@ -31,10 +30,9 @@ namespace VMS.TPS
             return Directory.GetFiles(dir, "*.exe").First();
         }
 
-        private string AssemblyDirectory()
+        private string GetSourceFilePath([CallerFilePath] string sourceFilePath = "")
         {
-            return @"\\vfs0006\RadData\oncology\ESimiele\fixCT\fixCT\bin\Debug";
+            return sourceFilePath;
         }
     }
-
 }
